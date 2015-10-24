@@ -75,19 +75,66 @@ function solution2(){
 
 
 function solution3(){
+  var groups = _.groupBy(items, 'CrsPBADept')
+    var counts = _.mapValues(groups, function(g){
+        return g.length
+    })
+    var top100 = _.chain(counts)
+      .pairs()
+      .filter(function(p) { return p[1] > 100 })
+      .unzip()
+      .value()
+    var data = {
+        labels: top100[0],
+        series: [
+            top100[1]
+        ]
+    }
+    new Chartist.Bar('#q3 .answer', data);
 }
 
 function solution4(){
+  var groups = _.groupBy(items, 'CrsPBADept')
+    var counts = _.mapValues(groups, function(g){
+        return g.length
+    })
+    var top10 = _.chain(counts)
+      .pairs()
+      .sortBy(function(p) { return -p[1] })
+      .take(10)
+      .unzip()
+      .value()
+    
+    var data = {
+        labels: top10[0],
+        series: [
+            top10[1]
+        ]
+    }
+    new Chartist.Bar('#q4 .answer', data);
 }
 
 function solution5(){
-    // TODO: replace the hard coded values in series by actual computation
+   var depts = _.chain(items)
+    .filter(function(i) 
+      { return i.CrsPBADept == 'CSCI' || i.CrsPBADept == 'HIST'})
+    .groupBy('CrsPBADept')
+    .value()
+  var deptsLeveled = _.mapValues(depts, function(d) {
+    return _.chain(d)
+      .groupBy('CrsLvlNum')
+      .mapValues(function(c) { return c.length})
+      .value()
+      })
+    csciUnzipped = _.unzip(_.pairs(deptsLeveled.CSCI))
+    histUnzipped = _.unzip(_.pairs(deptsLeveled.HIST))
+    
     var data = {
-          labels: ['1xxx', '2xxx', '3xxx', '4xxx'],
-          series: [
-            [20,30,40,50],  // CSCI
-            [30,30,30,30]   // HIST
-          ]
+        labels: csciUnzipped[0],
+        series: [
+            histUnzipped[1],
+            csciUnzipped[1]
+        ]
     }
     new Chartist.Bar('#q5 .answer', data);
 }

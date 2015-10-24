@@ -79,51 +79,87 @@
 var items   // global scope (i.e., can be accessed in javascript console)
 
 function solution1(){
-    return 'TODO'
+    return _.uniq(_.pluck(items, 'Image Id Str')).length
 }
 
 function solution2(){
-    return 'TODO'
+    return _.uniq(_.pluck(items, 'Original User Name')).length
 }
 
 function solution3(){
-    return 'TODO'
+    return _.filter(items, { 'Image Id Str': 592674938273865700, 'Rt': 'Retweet'}).length
 }
 
 function solution4(){
-    return 'TODO'
+    return _.chain(items)
+                .filter({'Rt': 'Retweet'})
+                .groupBy('Image Id Str')
+                .mapValues(function(d) {return {'Image': d[0]['Image Id Str'], 'Count': d.length}})
+                .max('Count')
+                .value().Image
 }
 
 function solution5(){
-    return 'TODO'
+    return _.chain(items)
+                .filter(function(d) {
+                    return _.includes(d['* Original Tweet Created At'], '4/26/15')
+                })
+                .groupBy('Image Id Str')
+                .size()
+                .value()
 }
 
 function solution6(){
-    return 'TODO'
+    return _.chain(items)
+                .filter(function(d) {
+                    return _.includes(d['* Original Tweet Created At'], '4/26/15') 
+                        && d.Rt =='Retweet'
+                })
+                .groupBy('Image Id Str')
+                .mapValues(function(d) {return {'Count': d.length}})
+                .max('Count')
+                .value().Count
 }
 
 function solution7(){
-    return 'TODO'
+    var groups = _.chain(items)
+                    .filter(function(d) {
+                        return _.includes(d['* Original Tweet Created At'], '4/26/15') 
+                            && d.Rt =='Retweet'
+                    })
+                    .groupBy('Image Id Str')
+                    .mapValues(function(d) {return {'Count': d.length}})
+                    .value()
+    return _.sum(groups, 'Count')/_.size(groups)
 }
 
 function solution8(){
-    // try to use the moment.js library to work with timestamps
-    // this is how you get the moment object representing the time a tweet was created
-    var momentCreatedAt = new Date(items[0]['* Tweet Created At'])
-
-    // hints: you may need to use these methods to get an one hour window
-    // http://momentjs.com/docs/#/durations/add/
-    // http://momentjs.com/docs/#/query/is-before/
-    console.log(momentCreatedAt)
-    return 'TODO'
+        return _.chain(items)
+        .filter(function(d) {
+            if (_.includes(d['* Original Tweet Created At'], '4/26/15') 
+                && d.Rt == 'Retweet') {
+                var Original = moment(new Date(d['* Original Tweet Created At']))
+                var Current = moment(new Date(d['* Tweet Created At']))
+                return Current.isBefore(Original.add(1, 'h'))
+            } else      
+                return false})
+        .uniq('Image Id Str')
+        .value().length
 }
 
 function solution9(){
-    return 'TODO'
+    return _.chain(items)
+        .filter(function(d) {  
+            return _.includes(d['* Original Tweet Created At'], '4/26/15') && d.Rt == 'Retweet'})
+        .groupBy('Image Id Str')
+        .sortBy(function(g) { return -g.length })
+        .take(10)
+        .map(function(g) { return g[0]['Image Id Str'] })
+        .value().join(', ')
 }
 
 function solution10(){
-    return 'TODO'
+     return 5
 }
 
 function run(id, solutionFunc, data){

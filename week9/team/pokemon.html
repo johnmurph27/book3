@@ -58,11 +58,15 @@ function solution3(data){
 }
 
 function solution4(data){
-    return 'TODO'
+     return _.max(data, 'Attack').Name
+    
 }
 
 function solution5(data){
-    return 'TODO'
+    return _.chain(data)
+      .filter({'Type': 'GRASS'})
+      .pluck('Name')
+      .value().join(', ')
 }
 
 function run(id, solutionFunc, data){
