@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+  <div class="container flow-text">
+  <h1 id="hackathon-business-locations">Hackathon - Business Locations</h1>
+<p>You are approached by a business developer to get advice on where to build a
+new store in Phoenix, AZ. There are currently six candidates. Use the Yelp
+dataset and come up with your own scoring scheme to identify the best location
+to recommend.</p>
+<h2 id="report">Report</h2>
+<p><a href="report.html">Read the Report</a></p>
+<h2 id="business-types">Business Types</h2>
+<p>As a team, choose one of the following business types to work on:</p>
+<ul>
+<li>A new full-service daycare center</li>
+<li>A new full-service car wash</li>
+<li>A new 24-hours gym</li>
+<li>A new 24-hours diner</li>
+<li>A new swimming pool</li>
+<li>A new organic food store</li>
+<li>A new sushi buffet</li>
+</ul>
+<h2 id="scoring-method">Scoring Method</h2>
+<p>For this hackathon, you will use a scoring method that is based on a series of
+20 Yes/No questions that can be applied to each candidate location. The candidate
+location that has the most number of Yes’s is the most viable location.</p>
+<p>Each Yes/No question generally should take on the form of</p>
+<p>  <em>Does the location have X nearby?</em></p>
+<p>where X is a feature that you think would be useful for the business to be viable.</p>
+<p>Two examples of such questions are:</p>
+<ol>
+<li>Does the location have <em>at least one McDonald’s within one mile</em>?</li>
+<li>Does the location have <em>at least ten businesses with 100 or more reviews within one mile</em>?</li>
+</ol>
+<h2 id="coding">Coding</h2>
+<p>Implement scoring functions and visualize how these candidate locations are
+scored. The skeleton code is provided for you in <a href="report.html">report.html</a>.</p>
+<h2 id="grading">Grading</h2>
+<p>Each person must implement at least two questions to receive credits for this
+hackathon.</p>
+<h2 id="submissions">Submissions</h2>
+<h3 id="business-type">Business Type</h3>
+<p>Our team chose to analyze candidate locations for a new full-service daycare center.</p>
+<h3 id="contributors">Contributors</h3>
+<p>The team members who contributed to this hackathon are:</p>
+<ul>
+<li>Nicole Woytarowicz</li>
+<li>Satchel Spencer</li>
+<li>Tristan Wagar</li>
+<li>John Murphy</li>
+<li>Sushant Mittal</li>
+</ul>
+<h3 id="20-questions">20 Questions</h3>
+<p>Our team came up with the following relevant questions:</p>
+<ol>
+<li><p><strong>Nicole</strong> Does the location not have any liquor stores within 3km? contributed by Nicole Woytarowicz</p>
+<p>Generally might signify a less nice part of town if there are liquor stores near by.</p>
+</li>
+<li><p>Is the location within 10km of the city center? contributed by Satchel Spencer</p>
+<p>You don’t want kids easily running off into the desert.</p>
+</li>
+<li><p><strong>Tristan</strong> Does the location have a park within 5 miles? contributed by Tristan Wagar</p>
+<p>Children like to play outside.</p>
+</li>
+<li><p>Does the location not have a lot of clubs and bars within 2km? contributed by Nicole Woytarowicz</p>
+<p>Generally don’t want to involve children in the nightlife of a city.</p>
+</li>
+<li><p>Does the location have pre-school or elementary school within 1km? contributed by Tristan Wagar</p>
+<p>Can drop your kids off at daycare after or before school.</p>
+</li>
+<li><p><strong>Tristan</strong> Does the location have a grocery store within 5 miles? contributed by Tristan Wagar</p>
+<p>Can easily do your grocery shopping after picking up or dropping off your kids.</p>
+</li>
+<li><p><strong>Satchel</strong> Does the location have any competeing daycares within 6km? contributed by Satchel Spencer</p>
+<p>Don’t want to be competing with other daycares.</p>
+</li>
+<li><p>Does the location have any 4 star or above restaurants within 5km? contributed by Satchel Spencer</p>
+<p>Indicator of affluence and better neighborhood.</p>
+</li>
+<li><p>Does the location have any restaurants with a price range above 3 within 3km? contributed by Nicole Woytarowicz</p>
+<p>Another indicator of affluence and better neighborhood.</p>
+</li>
+<li><p>Does the location have any restaurants within 5 km that are good for kids? contributed by Tristan Wagar</p>
+<p>So you can take your kids out to eat after picking them up.</p>
+</li>
+<li><p>Does the location have any locations within 3km that have free wifi? contributed by Satchel Spencer</p>
+<p>In case a parent needs internet to get some work done, they can do so near by the kids.</p>
+</li>
+<li><p><strong>Nicole</strong> Is there a hospital within 5km? contributed by Satchel Spencer</p>
+<p>In case something happens to a child and they need to be seen by a doctor.</p>
+</li>
+<li><p><strong>John</strong> Is there street parking within 1km of the location? contributed by Satchel Spencer</p>
+<p>So parents can park somewhere when dropping off their kids.</p>
+</li>
+<li><p>Are there any businesses with an upscale ambience within 5km of the location? contributed by Satchel Spencer</p>
+<p>Indicator of affluence and nice neighborhood again.</p>
+</li>
+<li><p>Are there a lot of businesses good for dessert within 1km of the location? contributed by Nicole Woytarowicz</p>
+<p>Children love sweets.</p>
+</li>
+<li><p><strong>Satchel</strong> Are there mostly quiet businesses within 1km of the location? contributed by Satchel Spencer</p>
+<p>Want to keep things peaceful.</p>
+</li>
+<li><p><strong>John</strong> Is there a lice service provider within 1km? contributed by Satchel Spencer</p>
+<p>Children are prone to getting lice, especially when in groups.</p>
+</li>
+<li><p><strong>Sushant</strong> Is there an ice cream/frozen yogurt place within 2km of the location? contributed by Satchel Spencer</p>
+<p>Children love ice cream.</p>
+</li>
+<li><p><strong>Sushant</strong> Is there a police department within 3km of the location? contributed by Satchel Spencer</p>
+<p>Want police departments to signify safety of location.</p>
+</li>
+<li><p>Are there any businesses with a classy ambience within 3km of the location? contributed by Nicole Woytarowicz</p>
+<p>Another indicator of affluence.</p>
+</li>
+</ol>
+<h3 id="conclusion">Conclusion</h3>
+<p>Our team collectively has implemented 10 scoring functions. Based on
+the scores, our team recommends location 1 from west to east,
+because it receives 7 out of 10 possible scores.</p>
+
+  </div>
+</body>
+</html>

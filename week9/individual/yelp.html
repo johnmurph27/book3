@@ -169,10 +169,11 @@ function solution8() {
 
     var coffeeInPhoenix = _.filter(businessesInPhoenix, function(d) {
         return _.some(d.categories, function(c) {
-            // console.log('c', c)
+             
             return ( _.includes(c, 'coffee') || _.includes(c, 'Coffee') )
         })
     })
+
     var coordinates = _.map(coffeeInPhoenix, function(d) {
         return { 'name': d.name, 'address': d.full_address, 'latitude': d.latitude, 'longitude': d.longitude }
     })
