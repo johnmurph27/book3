@@ -1,0 +1,194 @@
+<html>
+<head>
+    <style>
+        .map {
+          min-height: 300px
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Where should we build X?</h1>
+
+    <section id="candidates" class="question">
+        <h4>Where are the candidate locations?</h4>
+        <div class="map"></div>
+    </section>
+
+    <h2>Scores</h2>
+    <section id="features">
+    </section>
+
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+    <script src="http://bigdatahci2015.github.io/data/js/geolib.js"></script>
+
+    <script>
+
+//
+// Candidate Locations
+//
+
+function getCandidateLocations(){
+  var locations = []
+  locations.push({latitude: 33.45, longitude: -112.03})
+  locations.push({latitude: 33.45, longitude: -112.04})
+  locations.push({latitude: 33.45, longitude: -112.05})
+  locations.push({latitude: 33.45, longitude: -112.06})
+  locations.push({latitude: 33.45, longitude: -112.07})
+  locations.push({latitude: 33.45, longitude: -112.08})
+  return locations
+}
+
+
+//
+// Scoring Functions
+//
+
+function has_some_feature_1(loc){
+  // TODO
+  return true
+}
+
+function has_some_feature_2(loc){
+  // TODO
+  return false
+}
+
+function has_some_feature_3(loc){
+  // TODO
+  return true
+}
+
+function has_some_feature_4(loc){
+  // TODO
+  return false
+}
+
+function has_some_feature_5(loc){
+  // TODO
+  return false
+}
+
+//
+// Compute a score for a location using the provided scoring function 'scoreFunc'
+// and visualization function 'vizFunc'
+//
+function scoreAndVisualize(locs, scoreFunc, vizFunc){
+
+  console.time('scoring ' + scoreFunc.name)
+  var scores = _.map(locs, scoreFunc)
+  console.timeEnd('scoring ' + scoreFunc.name)
+
+  var title = _.startCase(scoreFunc.name)
+  var section = $('<section><h4>' + title + '</h4><div class="map"></div></section>').appendTo('#features')
+  var mapElement = $(section).find('.map')[0]
+  vizFunc(mapElement, locs, scores)
+}
+
+//
+// Visualization Functions
+//
+
+// visualize a list of locations on a map
+function visualize(domElement, locs){
+    var map = L.map(domElement).setView([33.45, -112.06], 13)
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a       href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'doubleshow.noeko77m',
+        accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
+    }).addTo(map)
+    map.touchZoom.disable()
+    map.doubleClickZoom.disable()
+    map.scrollWheelZoom.disable()
+
+    _.forEach(locs, function(loc){
+      var latlng = [loc.latitude, loc.longitude]
+      var circle = L.circle(latlng, 10, {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: 0.5
+      }).addTo(map);
+    })
+}
+
+// visualize a list of locations on a map
+// represent each location's score using green (TRUE) or red (FALSE)
+function visualize_true_or_false(domElement, locs, scores){
+    var map = L.map(domElement).setView([33.45, -112.06], 13)
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a       href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'doubleshow.noeko77m',
+        accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
+    }).addTo(map)
+    map.touchZoom.disable()
+    map.doubleClickZoom.disable()
+    map.scrollWheelZoom.disable()
+
+    _.forEach(locs, function(loc, i){
+
+      var latlng = [loc.latitude, loc.longitude]
+      var score = scores[i]
+
+      var color
+      if (score){
+        color = 'green'
+      } else {
+        color = 'red'
+      }
+      var circle = L.circle(latlng, 50, {
+          color: color,
+          fillColor: '#f03',
+          fillOpacity: 1
+      }).addTo(map);
+    })
+}
+
+var items = []
+function loadDataThenRunSolutions(){
+
+  var locs = getCandidateLocations()
+  visualize($('#candidates .map')[0], locs)
+
+  $.get({url: 'http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.phoenix.json.lines.txt'})
+   .done(function(data){
+      var lines = data.trim().split('\n')
+
+      // convert text lines to json arrays and save them in `items`
+      items = _.map(lines, JSON.parse)
+
+      // take only the last 2000 to speed up computation
+      // TODO: comment this out before the final submission
+      items = _.takeRight(items, 2000)
+
+      console.log('number of items loaded:', items.length)
+      console.log('first item:', items[0])
+
+      console.log('scoring all candidate locations')
+
+      scoreAndVisualize(locs, has_some_feature_1, visualize_true_or_false)
+      scoreAndVisualize(locs, has_some_feature_2, visualize_true_or_false)
+      scoreAndVisualize(locs, has_some_feature_3, visualize_true_or_false)
+      scoreAndVisualize(locs, has_some_feature_4, visualize_true_or_false)
+      scoreAndVisualize(locs, has_some_feature_5, visualize_true_or_false)
+
+   })
+   .fail(function(err){
+       console.error(err)
+   })
+}
+
+loadDataThenRunSolutions()
+
+    </script>
+</body>
+</html>
