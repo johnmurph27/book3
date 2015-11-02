@@ -11,10 +11,6 @@
         .parallax-container {
           height: 300
         }
-        .popup {
-            width: 500;
-            height: 500;
-        }
         #title {
           position: absolute;
           padding: 20px;
@@ -32,10 +28,8 @@
           color: #BBB;
           text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
         }
-        #map { height: 1000px; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
 </head>
 <body>
 
@@ -43,13 +37,7 @@
     <div class="parallax">
       <img src="nepal.jpg">
       <h1 id="title">What are the patterns of image diffusion during the Nepal Earthquake?
-        <div class="authors">[William Farmer](http://github.com/willzfarmer)
-                             [Kevin Gifford](http://github.com/kevinkgifford)
-                             [Parker Illig](http://github.com/pail4944)
-                             [Robert Kendl](http://github.com/DomoYeti)
-                             [Andrew Krodinger](http://github.com/drewdinger)
-                             [John Raesly](http://github.com/jraesly)
-        </div>
+        <div class="authors">by </div>
       </h1>
 
     </div>
@@ -60,36 +48,14 @@
       <div id="questions" class="collection with-header">
           <div class="collection-header">Questions</div>
           <section id="q1" class="question collection-item">
-              <h4>Q1: How many tweets had "share location" enabled? How many users had "share location" enabled? Did any user enable "share location" <b>in-between</b> subsequent tweets? (contributed by Kevin Gifford) <b></h4>
+              <h4>What is the break up between hindu and nepali tweets?</h4>
               <div class="answer"></div>
           </section>
 
-          <section id="q2" class="question collection-item">
-              <h4>Can we plot the tweets that have coordinates? (contributed by Will Farmer).
-               <b>Hover (place mouse) over tweets with coordinate locations (red dots) for location imagery.</b> Size of red dots indicates number of tweet followers.<h4>
-              <div class="answer" id="map"></div>
-          </section>
+          
 
-          <section id="q3" class="question collection-item">
-              <h4>Out of all the tweets that gave coordinates, which ones were retweeted from another source? (contributed by Robert Kendl)<h4>
-              <div class="answer"></div>
-          </section>
-
-          <section id="q4" class="question collection-item">
-              <h4>What is the average follower count for each person that tweets with coordinates? (contributed by Parker Illig)<h4>
-              <div class="answer"></div>
-          </section>
-
-          <section id="q5" class="question collection-item">
-              <h4>Which tweets got retweeted the most by user? (contributed by John Raesly)<h4>
-              <div class="answer"></div>
-          </section>
+          
       </div>
-
-          <section id="q6" class="question collection-item">
-              <h4>question? (contributed by Andrew Krodinger)<h4>
-              <div class="answer"></div>
-          </section>
 
   </div>
 
@@ -103,12 +69,10 @@
   <div class="section white container flow-text">
     <div class="markdown">
 
-# Discussion
-
-*  It is interesting that of the data set of 1463 tweets (160 different Users) that 150 out of 160 users never had "Location Sharing" enabled (hypothesize because of privacy concerns primarily; a secondary reason for disabling Location Sharing is bandwidth consumption, which is not free).
-*  However, three users did turn on Location Sharing after previously transmitting a tweet with Location Sharing disabled.  This makes intuitive sense in that these three (possible more tech-savvy?) Users chose to trade higher-fidelity information in a time of crisis and sacrifice personal privacy concerns.
+# Findings, Recommendations and Future Work
 
 
+<ul type="disc">
     </div>
   </div>
 
@@ -117,109 +81,153 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
-    <script src="http://bigdatahci2015.github.io/data/js/geolib.js"></script>
     <script>
 
 var items   // global scope (i.e., can be accessed in javascript console)
-var map
 
-function solution1() {
-    // Kevin Gifford
-    var tweetsWithCoordinates = _.filter(items, function(d) {
-        return d['Tweet Coords'] != ""
+function solution1(){
+    
+
+    // Get original tweets
+    var ot = _.filter(items,function(d){
+        return d['Rt'] != "Retweet"
     })
-    var uniquetweetsWithCoordinates = _.unique(tweetsWithCoordinates, 'User Screen Name')
+    var otfollow = _.groupBy(ot, 'Tweet Language')
+    console.log(otfollow)
+    hiLength = otfollow['hi'].length
+    neLength = otfollow['ne'].length
+    hiPer = (hiLength / (hiLength+neLength) ) * 100
+    nePer = (neLength / (hiLength+neLength) ) * 100
 
-    var string = ''
-    var evaluate = _.map(uniquetweetsWithCoordinates, function(d) {
-        var pTweets = _.filter(items, function(f) {
-            return d['User Screen Name'] == f['User Screen Name']   
-        })
-        if (_.size(pTweets) > 1) { 
-            var uniqueTweetTimestamp = d['* Tweet Created At']
-            var pTweetsTimestamp = _.map(pTweets, function(f) {
-                if (moment(d['* Tweet Created At']).isBefore(moment(f['* Tweet Created At']))) {
-                    // Found a tweet user that enabled location sharing 
-                    string += '\n ' + d['User Screen Name'] + ' first tweeted at ' + d['* Tweet Created At'] + ' then turned on Location Sharing in subsequent tweet at ' + f['* Tweet Created At'] + '! '
-                }
+    console.log(hiPer)
+    console.log(nePer)
+    return "Percentage of Hindu tweets:"+ hiPer +"%\n Percentage of Nepali tweets: "+ nePer +"%\n"
+
+    
+    // Dataset is not complete so filter retweet counts to only those with
+    // orinal tweets in the datase
+ 
+}
+
+function solution2(){
+    var separators = [' ', '\\\+', '-', '\\\(', '\\\)', '\\*', '/', ':', '\\\?','_',',',';','____',"&",'/ ',': ',"#","!"];
+  //var list = []
+  var upperCase = _.memoize(function(string) {
+    return string.toLowerCase();
+  });
+  var local = _.filter(items, function(x){
+    var tokens = x['User Location'].split(new RegExp(separators.join('|'), 'g'));
+    var list = []
+    _.forEach(tokens,function(f){
+      list = list.concat(upperCase(f))
+    })
+    return !(_.contains(list,"singapore"))&&!(_.contains(list,"russia"))&&!(_.contains(list,"usa"))&&!(_.contains(list,"japan"))&&!(_.contains(list,"australia"))
+    &&!(_.contains(list,"london"))&&!(_.contains(list,"kuala"))&&!(_.contains(list,"india"))&&!(_.contains(list,"zealand"))&&!(_.contains(list,"adelaide"))
+    &&!(_.contains(list,"ireland"))&&!(_.contains(list,"sudan"))&&!(_.contains(list,"canada"))&&!(_.contains(list,"malaysia"))
+  })
+  var international = _.filter(items,function(x){
+    var tokens = x['User Location'].split(new RegExp(separators.join('|'), 'g'));
+    var list = []
+    _.forEach(tokens,function(f){
+      list = list.concat(upperCase(f))
+    })
+    return (_.contains(list,"singapore"))||(_.contains(list,"russia"))||(_.contains(list,"usa"))||(_.contains(list,"japan"))||(_.contains(list,"australia"))
+    ||(_.contains(list,"london"))||(_.contains(list,"kuala"))||(_.contains(list,"india"))||(_.contains(list,"zealand"))||(_.contains(list,"adelaide"))
+    ||(_.contains(list,"ireland"))||(_.contains(list,"sudan"))||(_.contains(list,"canada"))||(_.contains(list,"malaysia"))
+  })
+  var int_rt = _.filter(international,function(x){
+    return _.contains(x['Rt'],"Retweet")
+  })
+  var local_rt = _.filter(local,function(x){
+    return _.contains(x['Rt'],"Retweet")
+  })
+  var int_percent = int_rt.length / international.length*100
+  var local_percent = local_rt.length /local.length*100
+  var proportion = local_percent/int_percent*100
+  return "international retweet percentage is:"+int_percent+"%\n Local retweet percentage is: "+local_percent+"%\n proportion of local over international retweet is "+proportion + "%\n"
+}
+
+//
+// Do tweets sent from influential tweeters have a longer lifespan?
+//
+function solution3(){
+    // define a template string
+    var tplString = '<g> \
+            <circle cx="${d.x}" \
+            cy="${d.y}" \
+            r="4" \
+            stroke="black" \
+            fill="red" /> \
+                    </g>'
+
+    // compile the string to get a template function
+    var template = _.template(tplString)
+
+    // Group tweets by the image id
+    var groups = _.groupBy(items, 'Image Id Str')
+
+    console.log('groups', groups)
+
+    // Find original tweets
+    var images = _.mapValues(groups, function(tweets) {
+        // A single image could originate from multiple tweets.
+        originalTweets = _.filter(tweets, {'* Original Tweet Created At': ''})
+
+        if (originalTweets) {
+            // Followers count is the sum of follower counts for all orignal tweets
+            followers = _.sum(_.pluck(originalTweets, 'User Followers Count'))
+
+            // lifespan of tweet = death (maximum retweet date)
+            // - birth (minimum creation date).
+            birth = _.min(originalTweets, function(tweet) {
+                return Date.parse(tweet['* Tweet Created At'])
             })
-        }
+            death = _.max(tweets, function(tweet) {
+                 return Date.parse(tweet['* Tweet Created At'])
+            })
+
+            lifespan = Date.parse(death['* Tweet Created At'])
+                - Date.parse(birth['* Tweet Created At'])
+            return [lifespan, followers]
+        } else return [-1, 0]
     })
 
-    var groups = _.groupBy(tweetsWithCoordinates, 'User Screen Name')
-    var counts = _.mapValues(groups, function(d) {
-        return d.length
+    // Extract entries with original tweet in data set
+    var filteredImages = _.filter(_.values(images), function(image) {
+        return image[0] >= 0
     })
 
-    var string1 = 'RESULTS: ' + tweetsWithCoordinates.length + ' tweets had "share location" enabled;'
-    var string2 = '\n ' + _.size(counts) + ' unique users had "share location" enabled;'
+    var noLife = _.filter(_.values(images), function(image) {
+        return image[0] == 0
+    }).length
 
-    return string1 + string2 + string
-}
+    var unzippedFilteredImages = _.unzip(filteredImages)
+    var maxLifespan = _.max(unzippedFilteredImages[0])
+    var maxFollowers = _.max(unzippedFilteredImages[1])
 
-function solution2() {
-    // Will Farmer
-   _.chain(items)
-       .filter(function(obj) {
-           return (obj["Tweet Coords"] != "")
-       }).map(function(obj) {
-           var latlng = JSON.parse(obj["Tweet Coords"].replace(/'/g, '"'))["coordinates"]
-           latlng.reverse()
-           var circle = L.circle(latlng, obj["User Followers Count"] * 2, {
-               color: 'red',
-               fillColor: '#f03',
-               fillOpacity: 1
-           }).addTo(map);
-           // http://stackoverflow.com/questions/13002961/leaflet-different-hover-and-click-events
-           circle.on('mouseover', function(evt) {
-                 //evt.target is the marker that is being moused over 
-                 //bindPopup() does not need to be called here if it was already called
-                 //somewhere else for this marker.
-                 //evt.target.bindPopup('hi').openPopup();
-                evt.target.bindPopup(
-                    '<img class="popup" src="' + obj['Media Url'] + '" alt="' + obj['Image Id Str'] + '">'
-                ).openPopup()
-           });
-       }).value()
-}
+    // X coordinate is the scaled time
+    function computeX(d, i) {
+        return 700 * d[0]/maxLifespan + 10
+    }
 
-function solution3() {
-    // Robert Kendl
-    var tweetsWithCoordinates = _.filter(items, function(d) {
-        return d['Tweet Coords'] != ""
-    })
-    var retweeted = _.filter(tweetsWithCoordinates, function(x){
-        return x['Rt'] == "Retweet"
-    })
-    return retweeted.length
-}
+    // Y coordinate is the scaled follower count
+    function computeY(d, i) {
+        return 180 * 10 * d[1]/maxFollowers + 10
+    }
 
-function solution4() {
-    // Parker Illig
-    var filtered = _.filter(items, function(d){
-        return d['Tweet Coords'] != ""
-    })
-    filtered = _.uniq(filtered, 'Image Id Str')
-    filtered = _.uniq(filtered, 'User Screen Name')    
-    // console.log('filtered', filtered)
-    // console.log('filtered.length', filtered.length)
-    var sum = _.sum(filtered, 'User Followers Count')
-    return (sum)/(filtered.length)
-}
+    var viz = _.map(filteredImages, function(d, i){
+                return {
+                    x: computeX(d, i),
+                    y: computeY(d, i)
+                }
+             })
 
-function solution5() {
-    // John Raesly
-    var user = _.groupBy(items, 'Original User Name')
-    var tweets =_.mapValues(user, function(d){
-        return d.length
-    })
-    sorted = _.sortByOrder(_.pairs(tweets),function(d){return d[1]},'desc')
-    return sorted
-}
+    var result = _.map(viz, function(d){
+             // invoke the compiled template function on each viz data
+             return template({d: d})
+         })
 
-function solution6() {
-    return 'TODO'
+    return '<svg width="100%" height="100%">' + result + '</svg>'
 }
 
 function run(id, solutionFunc, data){
@@ -229,18 +237,8 @@ function run(id, solutionFunc, data){
 }
 
 function loadDataThenRunSolutions(){
-  map = L.map('map').setView([27, 85], 6)
-  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a       href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 18,
-      id: 'doubleshow.noeko77m',
-      accessToken: 'pk.eyJ1IjoiZG91Ymxlc2hvdyIsImEiOiJjaWZ5Y3B1eTE1MHRidWRtMG9uZXluajg4In0.u5ONW27Ly5cU7M5KYi6Y9Q'
-  }).addTo(map)
-  map.touchZoom.disable()
-  map.doubleClickZoom.disable()
-  map.scrollWheelZoom.disable()
-
-  $.get('http://bigdatahci2015.github.io/data/twitter/nepal_local_tweets.json')
+  // $.get('http://bigdatahci2015.github.io/data/twitter/nepal_local_tweets.json')
+  $.get('../../week9/team/nepal_local_tweets.json')
     .done(function(data){
 
         items = data
@@ -250,9 +248,6 @@ function loadDataThenRunSolutions(){
        run('#q1', solution1, items)
        run('#q2', solution2, items)
        run('#q3', solution3, items)
-       run('#q4', solution4, items)
-       run('#q5', solution5, items)
-       run('#q6', solution6, items)
      })
      .fail(function(err){
          console.error(err)

@@ -1,0 +1,172 @@
+<html>
+<head>
+  <title>Twitter Events - Team</title>
+    <style>
+        .answer {
+            min-height: 50px
+        }
+        section{
+          padding: 10px;
+          margin-bottom: 12px
+        }
+        #title {
+          position: absolute;
+          padding: 20px;
+          font-size: 64px;
+          font-weight: bolder;
+          color: white;
+          top: 50px;
+          left: 0px;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #title .authors {
+          padding: 20px;
+          font-size: 32px;
+          font-weight: bolder;
+          color: #BBB;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #tweets {
+          min-height: 300px;
+        }
+        .event {
+          color: red;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+
+  <div class="parallax-container"  style="height:300px">
+    <div class="parallax">
+      <img src="russia.jpg">
+      <h1 id="title">What did people tweet about Russia?
+        <div class="authors">by Team ???: Name1, Name2, Name3, Name4, </div>
+      </h1>
+    </div>
+  </div>
+
+  <div class="section white container flow-text">
+      <div id="tweets" class="col s10 collection">
+      </div>
+  </div>
+
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+  <script>
+
+// TODO: replace this team id with your team name
+var TEAM_ID = 'team0' // e.g., team1, team2, team3, team4, or team5
+
+// create a firebase reference rooted at 'https://big-data-hci-hackathon.firebaseio.com/'
+var firebase = new Firebase('https://big-data-hci-hackathon.firebaseio.com/')
+
+// observe the data location 'https://big-data-hci-hackathon.firebaseio.com/russia'
+firebase
+  .child('russia')
+  .on('value', function(snapshot){
+    // this function is invoked each time there's update on the value
+    var tweet = snapshot.val()
+    update(tweet)
+})
+
+var tweets = []
+function update(tweet){
+  tweets.push(tweet)
+
+  console.log('new tweet', tweet, 'total observed', tweets.length)
+
+  // html element to display the new tweet
+  var newTweetHtml = '<div class="collection-item">' + tweet.text + '</div>'
+
+  // prepend to #tweets
+  $('#tweets').prepend(newTweetHtml)
+
+  // run a list of detector functions
+  has_observed_five_tweets(tweets)
+  has_observed_two_tweets_in_a_row_about_the_crash(tweets)
+}
+
+function emit_event(message){
+
+  var event = {
+    message: message,
+    createdAt: Firebase.ServerValue.TIMESTAMP // ref: https://www.firebase.com/docs/web/api/servervalue/timestamp.html
+  }
+
+  console.log('event detected:', event)
+
+  // html element to display the detected event
+  var eventHtml = '<div class="collection-item event">' + event.message + '</div>'
+
+  // prepend to #tweets
+  $('#tweets').prepend(eventHtml)
+
+  // post the event to firebase
+  firebase
+    .child('events')
+    .child(TEAM_ID)
+    .push()
+    .set(event)
+}
+
+//
+// Event Detectors
+//
+function has_observed_five_tweets(tweets){
+  if (tweets.length % 5 == 0) {
+    emit_event('has observed ' + tweets.length + ' tweets')
+  }
+}
+
+function has_observed_two_tweets_in_a_row_about_the_crash(tweets){
+  // TODO: WARMUP - implement the correct logic to detect two tweets in a row
+  // mentioning the crash
+  var inArow = 0
+  var temp = 0
+  _.map(tweets, function(item){
+    if (temp == 0 && item["text"].includes("crash")) {temp =1};
+    if ((temp == 1 )&& (inArow == 0) && item["text"].includes("crash")) {inArow =1}
+    else
+      temp = 0
+  })
+  return inArow > 0
+}
+
+function has_observed_something_interesting_1(tweets){
+  // TODO:
+}
+
+function has_observed_something_interesting_2(tweets){
+  // TODO:
+}
+
+
+function has_observed_something_interesting_3(tweets){
+  // TODO:
+}
+
+
+function has_observed_something_interesting_4(tweets){
+  // TODO:
+}
+
+
+function has_observed_something_interesting_5(tweets){
+  // TODO:
+}
+
+
+// initialize the parallax effect
+$(document).ready(function(){
+    $('.parallax').parallax()
+})
+
+    </script>
+
+</body>
+</html>
