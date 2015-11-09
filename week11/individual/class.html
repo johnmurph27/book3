@@ -1,0 +1,251 @@
+<html>
+<head>
+  <title>Me</title>
+    <style>
+        .answer {
+            min-height: 50px
+        }
+        section{
+          padding: 10px;
+          margin-bottom: 12px
+        }
+        #title {
+          position: absolute;
+          padding: 20px;
+          font-size: 64px;
+          font-weight: bolder;
+          color: white;
+          top: 50px;
+          left: 0px;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #title .authors {
+          padding: 20px;
+          font-size: 32px;
+          font-weight: bolder;
+          color: #BBB;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #tweets {
+          min-height: 300px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+
+  <div class="parallax-container"  style="height:300px">
+    <div class="parallax">
+      <img src="cloud.jpg">
+      <h1 id="title">What is everyone in the class's activity?
+        <div class="authors">by Name</div>
+      </h1>
+    </div>
+  </div>
+
+  <div class="section white container flow-text">
+      <div id="questions" class="col s10 collection">
+      </div>
+  </div>
+
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+  <script>
+
+// TODO: replace the FIREBAW_URL with your own
+var CLASS_FORKS = 'https://big-data-hci-hackathon.firebaseio.com/book3/forks'
+
+// add the personal firebase url to the class's firebase
+
+new Firebase(CLASS_FORKS)
+  .once('value', function(snapshot){
+    var forks  = snapshot.val()
+
+    _.forEach(forks, function(fork){
+      var individual_github_name = fork.owner.login
+      var individual_firebase_url = 'https://' + individual_github_name + '-bigdata-hci.firebaseio.com'
+      console.log('firebase url', individual_firebase_url)
+
+      new Firebase(individual_firebase_url)
+        .child('events')
+        .once('value', function(snapshot){
+          var events = snapshot.val()
+
+          handle_individual_events(individual_github_name, events)
+
+        }, function(err){
+          console.error(err)
+        })
+
+    })
+
+})
+
+// array to collect event data from all individuals
+var class_events = {}
+
+// initial call to analyze when the class_events are still empty
+analyze(class_events)
+
+// each time events data from an individual is received, this event handler is called
+function handle_individual_events(name, individual_events){
+
+  // use the me of the
+  class_events[name] = individual_events
+
+  console.log('loaded data from ' + _.values(class_events).length + ' individuals')
+
+  analyze(class_events)
+}
+
+var firstTime = true
+function ask(func, events){
+  var answer = func(events)
+
+  // html element to display the answer
+  var answerHtml = '<div class="collection-item answer">' +
+      '<h4>' + _.startCase(func.name) + '? </h4>' +
+      '<div>' + answer + '</div>'
+    '</div>'
+
+  // append to #quetions
+  $('#questions').append(answerHtml)
+}
+
+function analyze(events){
+  $('#questions').html('')
+
+  ask(how_many_individuals_analyzed_so_far, events)
+  ask(whose_data_is_available, events)
+  ask(what_apps_are_people_using, events)
+ 
+  ask(how_many_students_include_twitter_account, events)
+  ask(How_many_students_have_youtube, events)
+  ask(Who_are_those_people_on_twitter, events)
+  ask(Who_are_those_people_on_youtube, events)
+  ask(how_many_students_include_gmail_account, events)
+  ask(Who_are_those_people_with_gmail, events)
+  ask(how_many_students_include_facebook_account, events)
+  ask(Who_has_the_most_gmail_entries, events)
+}
+
+function how_many_individuals_analyzed_so_far(events){
+  console.log('events', _.values(events))
+  return _.keys(events).length
+}
+
+function whose_data_is_available(events){
+  return _.keys(events).join(' , ')
+}
+
+function what_apps_are_people_using(events){
+   return _.chain(events)
+    .values(events)                         // get events for each user
+    .map(function(e) { return _.keys(e) })  // get app names
+    .flatten()
+    .uniq()
+    .filter(function(a) {
+      return !_.startsWith(a, '-K2')       // filter out invalid app names
+    }).value().join(', ')
+}
+
+function how_many_tweets(events){
+   
+}
+
+
+function how_many_students_include_twitter_account(events){
+  var twitterAccount = _.filter(events,function(n){
+    return _.includes(_.keys(n),'twitter')
+  }).length
+  return twitterAccount
+}
+
+function How_many_students_have_youtube(events){
+  x = _.filter(events,function(dv,dk,dc){
+    y = _.has(dv,'youtube')
+    return y
+  })
+  return x.length
+}
+
+function Who_are_those_people_on_twitter(events){
+  w = _.pairs(events)
+  console.log(w)
+  x = _.filter(w, function(d){
+    console.log(d)
+    z = _.has(d[1],'twitter')
+    return z
+  })
+  console.log(x)
+  q = _.zipObject(x)
+  return _.keys(q).join(' , ')
+}
+
+function Who_are_those_people_on_youtube(events){
+  w = _.pairs(events)
+  console.log(w)
+  x = _.filter(w, function(d){
+    console.log(d)
+    z = _.has(d[1],'youtube')
+    return z
+  })
+  console.log(x)
+  q = _.zipObject(x)
+  return _.keys(q).join(' , ')
+}
+
+function how_many_students_include_gmail_account(events){
+  var twitterAccount = _.filter(events,function(n){
+    return _.includes(_.keys(n),'gmail')
+  }).length
+  return twitterAccount
+}
+
+function Who_are_those_people_with_gmail(events){
+  w = _.pairs(events)
+  console.log(w)
+  x = _.filter(w, function(d){
+    console.log(d)
+    z = _.has(d[1],'gmail')
+    return z
+  })
+  console.log(x)
+  q = _.zipObject(x)
+  return _.keys(q).join(' , ')
+}
+
+function how_many_students_include_facebook_account(events){
+  var twitterAccount = _.filter(events,function(n){
+    return _.includes(_.keys(n),'facebook')
+  }).length
+  return twitterAccount
+}
+
+function Who_has_the_most_gmail_entries(events){
+  e1 = _.mapValues(events, function(d){
+    x = _.pick(d, 'gmail')
+    return _.size(x) 
+  })
+  console.log(e1)
+  y = _.max(e1)
+  z = _.findKey(e1, function(f){
+    return f == y
+  })
+  return z
+}
+
+
+// initialize the parallax effect
+$(document).ready(function(){
+    $('.parallax').parallax()
+})
+
+    </script>
+
+</body>
+</html>

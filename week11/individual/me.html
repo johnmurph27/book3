@@ -1,0 +1,159 @@
+<html>
+<head>
+  <title>Me</title>
+    <style>
+        .answer {
+            min-height: 50px
+        }
+        section{
+          padding: 10px;
+          margin-bottom: 12px
+        }
+        #title {
+          position: absolute;
+          padding: 20px;
+          font-size: 64px;
+          font-weight: bolder;
+          color: white;
+          top: 50px;
+          left: 0px;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #title .authors {
+          padding: 20px;
+          font-size: 32px;
+          font-weight: bolder;
+          color: #BBB;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+        }
+        #tweets {
+          min-height: 300px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+</head>
+<body>
+
+  <div class="parallax-container"  style="height:300px">
+    <div class="parallax">
+      <img src="cloud.jpg">
+      <h1 id="title">What is my online activity?
+        <div class="authors">by Name</div>
+      </h1>
+    </div>
+  </div>
+
+  <div class="section white container flow-text">
+      <div id="questions" class="col s10 collection">
+      </div>
+  </div>
+
+  <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+  <script>
+
+// TODO: replace the FIREBAW_URL with your own
+var PERSONAL_FIREBASE_URL = 'https://doubleshow-bigdata-hci.firebaseio.com/'
+
+// add the personal firebase url to the class's firebase
+
+// load events from the personal firebase
+var personal_firebase = new Firebase(PERSONAL_FIREBASE_URL)
+personal_firebase
+  .child('events')
+  .on('value', function(snapshot){
+    var events = snapshot.val()
+    analyze(events)
+})
+
+function ask(func, events){
+  var answer = func(events)
+
+  // html element to display the answer
+  var answerHtml = '<div class="collection-item answer">' +
+      '<h4>' + _.startCase(func.name) + '? </h4>' +
+      '<div>' + answer + '</div>'
+    '</div>'
+
+  // append to #quetions
+  $('#questions').append(answerHtml)
+}
+
+function analyze(events){
+  console.log(events)
+
+  ask(when_did_i_start_collecting, events)
+  ask(how_many_emails_have_i_received_since, events)
+  ask(question1, events)
+  ask(question2, events)
+  ask(question3, events)
+  ask(question4, events)
+  ask(question5, events)
+  ask(question6, events)
+  ask(question7, events)
+  ask(question8, events)
+  ask(question9, events)
+  ask(question10, events)
+}
+
+function when_did_i_start_collecting(events){
+  return 'I started collecting from [TODO: earliest timestamp].'
+}
+
+function how_many_emails_have_i_received_since(events){
+  return 'I received ' + _.values(events.gmail).length + ' emails.'
+}
+
+function question1(events){
+  return 'I ...'
+}
+
+function question2(events){
+  return 'I ...'
+}
+
+function question3(events){
+  return 'I ...'
+}
+
+function question4(events){
+  return 'I ...'
+}
+
+function question5(events){
+  return 'I ...'
+}
+
+function question6(events){
+  return 'I ...'
+}
+
+function question7(events){
+  return 'I ...'
+}
+
+function question8(events){
+  return 'I ...'
+}
+
+function question9(events){
+  return 'I ...'
+}
+
+function question10(events){
+  return 'I ...'
+}
+
+// initialize the parallax effect
+$(document).ready(function(){
+    $('.parallax').parallax()
+})
+
+    </script>
+
+</body>
+</html>
