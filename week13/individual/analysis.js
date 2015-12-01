@@ -74,27 +74,74 @@ function example3(){
 }
 
 function func1(){
-  return '...'
+  var objSam = _.chain(items)
+    .map('Samples')
+    .flatten()
+    .uniq()
+    .filter(function(s) { return s > 0 })
+    .map(_.round)                     
+    .value()
+
+  return 'There are ' + objSam.length + ' unique positive samples and they are ' + objSam.join(', ')
 }
 
 function func2(){
-  return '...'
+    var deltas = 
+    _.map(items, function(item, i) {
+    if (i == 0) return 0
+    else {
+      var str = items[i-1].Ping_time.split(':')
+      var t0 = parseInt(str[0]) * 3600+ parseInt(str[1]) * 60 + parseInt(str[2])
+
+      str = items[i].Ping_time.split(':')
+      var t1 = parseInt(str[0]) * 3600+ parseInt(str[1]) * 60 + parseInt(str[2])
+
+      return t1 - t0
+    }
+  })
+
+  // Return average of the time differences
+  return _.round(_.sum(deltas)/deltas.length) + ' seconds'
 }
 
+
 function func3(){
-  return '...'
+    return _.chain(items)
+    .find({'Ping_time': '09:57:18'})
+    .filter(function(s) { return s == 7 })
+    .value().length
 }
 
 function func4(){
-  return '...'
+    var counted = _.chain(items)
+    .map(function(d) { 
+      var count = _.filter(d.Samples, function(s) { return s == 3 }).length
+      return { 'Ping_index': d.Ping_index, 'Count': count }
+    })
+    .sortBy('Count')
+    .value()
+  var max = _.max(counted, function(d) { return d.Count })
+  return _.chain(counted)
+    .filter(function(d) { return d.Count == max.Count })
+    .pluck('Ping_index')
+    .value().join(', ')
 }
 
+
 function func5(){
-  return '...'
+  return _.filter(items, function(d) { return _.max(d.Samples) <= 0}).length
 }
 
 function func6(){
-  return '...'
+  return _.chain(items)
+    .map('Samples')
+    .flatten()
+    .filter(function(d) { return d > 0 })
+    .groupBy()
+    .mapValues('length')
+    .pairs()
+    .max(function(d) { return d[1] })
+    .value()[0]
 }
 
 function func7(){
@@ -102,37 +149,195 @@ function func7(){
   // this sample code shows how to display a map and put a marker to visualize
   // the location of the first item (i.e., measurement data)
   // you need to adapt this code to answer the question
+  var coordNYC = {latitude: 40.7127, longitude: -74.0059}
 
-  var first = items[0]
-  var pos = [first.Latitude, first.Longitude]
+  var max = _.chain(items)
+    .map(function(d) {
+      var coord = {latitude: d.Latitude, longitude: d.Longitude}
+      return [geolib.getDistance(coordNYC, coord), d.Latitude, d.Longitude]
+    }).max(function(d) { return d[0] })
+    .value()
+
+  var boat = [parseFloat(max[1]), parseFloat(max[2])]
   var el = $(this).find('.viz')[0]    // lookup the element that will hold the map
-  $(el).height(500) // set the map to the desired height
-  var map = createMap(el, pos, 5)
+  $(el).height(500)                   // set the map to the desired height
+  var map = createMap(el, boat, 6)
 
-  var circle = L.circle(pos, 500, {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5
-  }).addTo(map);
-  return '...'
+  var marker = L.marker(boat).addTo(map)
+  marker.bindPopup('Boat Location').openPopup()
+
+  var latlngs = [[40.7127, -74.0059], boat]
+  L.polyline(latlngs, {color: 'blue'}).addTo(map)
+
+  return 'Distance was ' + max[0]/1000 + ' km'
 }
 
 function func8(){
-  return '...'
+  var center = geolib.getCenter([
+      {latitude: items[0].Latitude, longitude: items[0].Longitude},
+      {latitude: items[items.length-1].Latitude, longitude: items[items.length-1].Longitude}
+    ])
+
+  var pos = [center.latitude, center.longitude]
+  var el = $(this).find('.viz')[0]   
+  $(el).height(500)                
+  var map = createMap(el, pos, 12)
+
+  _.forEach(items, function(d, index) {
+    var latlng1 = [parseFloat(d.Latitude), parseFloat(d.Longitude)]
+
+    if (index == 0) {
+      var marker = L.marker(latlng1).addTo(map)
+      marker.bindPopup('Starting Point').openPopup()
+    } else {
+      var latlng0 = [parseFloat(items[index-1].Latitude), parseFloat(items[index-1].Longitude)]
+      var latlngs = [latlng0, latlng1]
+      var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map)
+    }
+  })
+
+  return 'Below are the boats traveled'
 }
 
 function func9(){
-  return '...'
+  var center = geolib.getCenter([
+      {latitude: items[0].Latitude, longitude: items[0].Longitude},
+      {latitude: items[items.length-1].Latitude, longitude: items[items.length-1].Longitude}
+    ])
+
+  var pos = [center.latitude, center.longitude]
+  var el = $(this).find('.viz')[0]   
+  $(el).height(500)                
+  var map = createMap(el, pos, 12)
+
+  var mostCommon = _.chain(items)
+    .map('Samples')
+    .flatten()
+    .filter(function(d) { return d > 0 })
+    .groupBy()
+    .mapValues('length')
+    .pairs()
+    .max(function(d) { return d[1] })
+    .value()[0]
+
+  _.forEach(items, function(d, index) {
+    if (_.includes(d.Samples, mostCommon)) {
+      var latlng = [parseFloat(d.Latitude), parseFloat(d.Longitude)]
+      L.circle(latlng, 50, {color: 'black', fillColor: 'blue', fillOpacity: 0.5}).addTo(map)
+    }
+  })
+  return 'Below is info'
 }
 
 function func10(){
-  return '...'
-}
+  var center = geolib.getCenter([
+      {latitude: items[0].Latitude, longitude: items[0].Longitude},
+      {latitude: items[items.length-1].Latitude, longitude: items[items.length-1].Longitude}
+    ])
 
+  var pos = [center.latitude, center.longitude]
+  var el = $(this).find('.viz')[0]   
+  $(el).height(500)                
+  var map = createMap(el, pos, 12)
+
+  var counts = _.map(items, function(d) {
+    var count = _.filter(d.Samples, function(s) { return s > 0 }).length
+    return [d.Latitude, d.Longitude, count]
+  })
+
+  var colors = ['#c6e1f1', '#a1cee9', '#7bbbe0', '#55a7d7', '#3c8ebd', '#2e6e93', '#285e7e', 
+    '#214f69', '#1a3f54', '#142f3f']
+
+  _.forEach(counts, function(c){
+    if(c[2] != 0) {
+      var latlng = [parseFloat(c[0]), parseFloat(c[1])]
+      var color = colors[parseInt(c[2]/10)]
+      L.circle(latlng, 5, { color: color, fillOpacity: 1 }).addTo(map);
+    }
+  })
+
+  return 'Darker shades represent higher densities'
+}
 function func11(){
-  return '...'
-}
 
+  // Create an L x D matrix, where L is latitude and D is depth.  
+  // Where fish are found, the corresponding entry is the depth, otherwise it is null.
+  // Measurements are taken every two meters of depth.
+  var fish = _.map(items, function(d) {
+    return _.map(d.Samples, function(s, index) {
+      var value = _.round(parseFloat(s))
+      return _.includes([3, 32, 39, 52, 1, 45, 40, 10, 11, 4, 37, 53, 8, 33, 30], value) ? index * 2 : null
+    })
+  })
+  var fishT = _.zip.apply(_, fish)
+  var fishTFiltered = _.filter(fishT, function(d) { return _.sum(d) != 0 })
+
+  var latitudes = []
+  var latStart = parseFloat(items[0].Latitude)
+  var latEnd = parseFloat(items[items.length-1].Latitude)
+  var step = (latEnd - latStart)/400
+  for (i = 0; i < 400; i++) latitudes[i] = (latStart + i * step)
+
+  // Then, plot locations where fish were found as (latitude, depth).
+  var el = $(this).find('.viz')[0]
+  $(el).height(500)   
+
+  var options = {
+    showLine: false,
+    axisX: { labelInterpolationFnc: function(value, index) {
+      return index % 50 === 0 ? value : null
+      }
+    }
+  }              
+
+  var data = {
+    labels: latitudes,
+    series: fishTFiltered
+  }
+
+  new Chartist.Line(el, data, options)
+
+  return 'The chart below shows the distribution of fish in relation to the latitude (x-axis) and depth (y-axis), in meters'
+}
 function func12(){
-  return '...'
+  // Create an L x D matrix, where L is latitude and D is depth.  
+  // Where plankton are found, the corresponding entry is the depth, otherwise it is null.
+  // Measurments are done every 2 meters of depth.
+  var plankton = _.map(items, function(d) {
+    return _.map(d.Samples, function(s, index) {
+      var value = _.round(parseFloat(s))
+      return _.includes([39, 52, 45, 42, 7, 13, 49, 40, 10, 11, 36, 37, 53, 8, 20], value) ? index * 2 : null
+    })
+  })
+  var planktonT = _.zip.apply(_, plankton)
+  var planktonTFiltered = _.filter(planktonT, function(d) { return _.sum(d) != 0 })
+
+  // X-axis is the Latitude
+  var latitudes = []
+  var latStart = parseFloat(items[0].Latitude)
+  var latEnd = parseFloat(items[items.length-1].Latitude)
+  var step = (latEnd - latStart)/400
+  for (i = 0; i < 400; i++) latitudes[i] = (latStart + i * step)
+
+  // Then, plot locations where plankton were found as (latitude, depth).
+  var el = $(this).find('.viz')[0]
+  $(el).height(500)   
+
+  var options = {
+    showLine: false,
+    axisX: { labelInterpolationFnc: function(value, index) {
+      return index % 50 === 0 ? value : null;
+      }
+    },
+    axisY: { type: Chartist.AutoScaleAxis, high: 600 }
+  }              
+
+  var data = {
+    labels: latitudes,
+    series: planktonTFiltered
+  }
+
+  new Chartist.Line(el, data, options)
+
+  return 'The chart below shows the distribution of plankton in relation to the latitude (x-axis) and depth (y-axis), in meters'
 }
